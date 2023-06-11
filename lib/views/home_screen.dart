@@ -18,6 +18,19 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text("Hive Database"),
         centerTitle: true,
       ),
+      body: Column(
+        children: [
+          FutureBuilder(
+            future: Hive.openBox("info"),
+              builder: (context,snapshot){
+            if(!snapshot.hasData){
+              return Center(child: CircularProgressIndicator(),);
+            }else{
+              return Text(snapshot.data!.get("listData")[1]['name']);
+            }
+          })
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           var box = await Hive.openBox("info");
