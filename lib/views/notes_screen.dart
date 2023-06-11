@@ -16,6 +16,13 @@ class _NotesScreenState extends State<NotesScreen> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   @override
+  void dispose() {
+    super.dispose();
+    titleController.dispose();
+    descriptionController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +47,14 @@ class _NotesScreenState extends State<NotesScreen> {
                             Text(data[index].title),
                             Spacer(),
                             IconButton(
-                                onPressed: () {}, icon: Icon(Icons.edit)),
+                                onPressed: () {
+                                  _editNotes(
+                                    notesModel: data[index],
+                                    title: data[index].title,
+                                    description: data[index].description,
+                                  );
+                                },
+                                icon: Icon(Icons.edit)),
                             SizedBox(width: 5),
                             IconButton(
                               onPressed: () {
@@ -69,9 +83,65 @@ class _NotesScreenState extends State<NotesScreen> {
       ),
     );
   }
-void delete({required NotesModel notesModel})async{
-   await notesModel.delete();
-}
+
+  void delete({required NotesModel notesModel}) async {
+    await notesModel.delete();
+  }
+
+  Future _editNotes(
+      {required NotesModel notesModel,
+      required String title,
+      required String description}) {
+    titleController.text = title;
+    descriptionController.text = description;
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Add Notes"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                notesModel.title = titleController.text;
+                notesModel.description = descriptionController.text;
+                notesModel.save();
+                Navigator.pop(context);
+              },
+              child: Text("Update"),
+            ),
+          ],
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    hintText: "title",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 15),
+                TextField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    hintText: "description",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future _showDialog() {
     return showDialog(
       context: context,
@@ -83,7 +153,7 @@ void delete({required NotesModel notesModel})async{
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text("Cencel"),
+              child: Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
