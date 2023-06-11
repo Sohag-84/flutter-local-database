@@ -27,21 +27,38 @@ class _NotesScreenState extends State<NotesScreen> {
         builder: (BuildContext context, box, Widget? child) {
           final data = box.values.toList().cast<NotesModel>();
           return ListView.builder(
-            itemCount: box.length,
-              itemBuilder: (context,index){
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(data[index].title),
-                      Text(data[index].description),
-                    ],
+              itemCount: box.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(data[index].title),
+                            Spacer(),
+                            IconButton(
+                                onPressed: () {}, icon: Icon(Icons.edit)),
+                            SizedBox(width: 5),
+                            IconButton(
+                              onPressed: () {
+                                delete(notesModel: data[index]);
+                              },
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(data[index].description),
+                      ],
+                    ),
                   ),
-                ),
-              );
-          });
+                );
+              });
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -52,7 +69,9 @@ class _NotesScreenState extends State<NotesScreen> {
       ),
     );
   }
-
+void delete({required NotesModel notesModel})async{
+   await notesModel.delete();
+}
   Future _showDialog() {
     return showDialog(
       context: context,
